@@ -12,7 +12,7 @@ export default async function handler(req, res) {
 
   const { script, auth } = req.body;
 
-  if (auth !== 'PASSWORD_RAHASIA_ANDA') {
+  if (auth !== 'alxzy') {
     return res.status(401).json({ error: 'Unauthorized' });
   }
 
