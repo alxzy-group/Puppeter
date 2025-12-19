@@ -4,7 +4,7 @@
   "type": "module",
   "scripts": {
     "install:browser": "npx puppeteer browsers install chrome",
-    "start": "npm run install:browser && pm2 delete alxzy-puppeteer || true && pm2 start api/run.js --name alxzy-puppeteer && pm2 save",
+    "start": "npm run install:browser && pm2 delete alxzy-puppeteer || true && pm2 start server.js --name alxzy-puppeteer && pm2 save",
     "logs": "pm2 logs alxzy-puppeteer",
     "stop": "pm2 stop alxzy-puppeteer"
   },
