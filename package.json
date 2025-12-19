@@ -1,10 +1,10 @@
 {
-  "name": "puppeteer-runner-vercel",
+  "name": "puppeteer-runner-vps",
   "version": "1.0.0",
   "type": "module",
   "dependencies": {
-    "@sparticuz/chromium": "latest",
-    "puppeteer-core": "latest",
+    "puppeteer": "latest",
+    "express": "latest",
     "axios": "latest"
   }
 }
