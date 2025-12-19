@@ -31,9 +31,8 @@ app.post('/api/run', async (req, res) => {
 
     const page = await browser.newPage();
     try {
-        await page.setDefaultNavigationTimeout(60000);
-        await page.setDefaultTimeout(60000);
-
+        await page.setDefaultNavigationTimeout(0);
+        await page.setDefaultTimeout(0)
         const dynamicTask = new Function('browser', 'page', `
             return (async () => {
                 ${script}
