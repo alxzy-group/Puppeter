@@ -1,52 +1,56 @@
-import chromium from '@sparticuz/chromium';
-import puppeteer from 'puppeteer-core';
+import puppeteer from 'puppeteer';
+import express from 'express';
 
-export default async function handler(req, res) {
-  if (req.method === 'OPTIONS') {
-    return res.status(200).end();
-  }
+const app = express();
+app.use(express.json());
 
-  if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' });
-  }
+let browser = null;
 
-  const { script, auth } = req.body;
-
-  if (auth !== 'alxzy') {
-    return res.status(401).json({ error: 'Unauthorized' });
-  }
-
-  if (!script) {
-    return res.status(400).json({ error: 'No script provided' });
-  }
-
-  let browser = null;
-
-  try {
+const initBrowser = async () => {
     browser = await puppeteer.launch({
-      args: chromium.args,
-      defaultViewport: chromium.defaultViewport,
-      executablePath: await chromium.executablePath(),
-      headless: chromium.headless,
-      ignoreHTTPSErrors: true
+        headless: "new",
+        args: [
+            '--no-sandbox',
+            '--disable-setuid-sandbox',
+            '--disable-dev-shm-usage',
+            '--disable-accelerated-2d-canvas',
+            '--no-first-run',
+            '--no-zygote',
+            '--single-process',
+            '--disable-gpu'
+        ]
     });
+};
+
+app.post('/api/run', async (req, res) => {
+    const { script, auth } = req.body;
+
+    if (auth !== 'alxzy') return res.status(401).json({ error: 'Unauthorized' });
+    if (!script) return res.status(400).json({ error: 'No script provided' });
 
     const page = await browser.newPage();
-    await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36');
+    try {
+        await page.setDefaultNavigationTimeout(60000);
+        await page.setDefaultTimeout(60000);
 
-    const dynamicTask = new Function('browser', 'page', `
-      return (async () => {
-        ${script}
-      })();
-    `);
+        const dynamicTask = new Function('browser', 'page', `
+            return (async () => {
+                ${script}
+            })();
+        `);
 
-    const result = await dynamicTask(browser, page);
+        const result = await dynamicTask(browser, page);
+        
+        await page.close();
+        return res.status(200).json({ success: true, data: result });
+    } catch (error) {
+        if (page) await page.close();
+        return res.status(500).json({ success: false, error: error.message });
+    }
+});
 
-    await browser.close();
-    return res.status(200).json({ success: true, data: result });
-
-  } catch (error) {
-    if (browser) await browser.close();
-    return res.status(500).json({ success: false, error: error.message });
-  }
-}
+const PORT = 3000;
+app.listen(PORT, async () => {
+    await initBrowser();
+    console.log(`Server jalan di port ${PORT}`);
+});
