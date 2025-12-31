@@ -9,16 +9,50 @@ read -p "Masukkan nama domain (contoh: ytdlp.alxzyy.my.id): " DOMAIN
 
 apt update && apt upgrade -y
 
-apt install -y curl
+apt install -y curl fontconfig
 curl -fsSL https://deb.nodesource.com/setup_current.x | bash -
 apt install -y nodejs
 
 apt install -y \
-    ca-certificates fonts-liberation libasound2t64 libatk-bridge2.0-0 libc6 libcairo2 \
-    libcups2 libdbus-1-3 libexpat1 libfontconfig1 libgbm1 libgcc-s1 libgdk-pixbuf2.0-0 \
-    libglib2.0-0 libgtk-3-0 libnspr4 libpango-1.0-0 libpangocairo-1.0-0 libstdc++6 \
-    libx11-6 libx11-xcb1 libxcb1 libxcomposite1 libxcursor1 libxdamage1 libxext6 \
-    libxfixes3 libxi6 libxrandr2 libxrender1 libxss1 libxtst6 lsb-release wget xdg-utils
+    ca-certificates \
+    fonts-liberation \
+    libasound2t64 \
+    libatk-bridge2.0-0 \
+    libatk1.0-0 \
+    libc6 \
+    libcairo2 \
+    libcups2 \
+    libdbus-1-3 \
+    libexpat1 \
+    libfontconfig1 \
+    libgbm1 \
+    libgcc-s1 \
+    libgdk-pixbuf-2.0-0 \
+    libglib2.0-0 \
+    libgtk-3-0 \
+    libnspr4 \
+    libnss3 \
+    libpango-1.0-0 \
+    libpangocairo-1.0-0 \
+    libstdc++6 \
+    libx11-6 \
+    libx11-xcb1 \
+    libxcb1 \
+    libxcomposite1 \
+    libxcursor1 \
+    libxdamage1 \
+    libxext6 \
+    libxfixes3 \
+    libxi6 \
+    libxrandr2 \
+    libxrender1 \
+    libxss1 \
+    libxtst6 \
+    libxkbcommon0 \
+    libdrm2 \
+    lsb-release \
+    wget \
+    xdg-utils
 
 apt install -y fonts-noto-color-emoji fonts-noto-cjk fonts-freefont-ttf nginx certbot python3-certbot-nginx
 
@@ -27,6 +61,7 @@ wget -O /usr/local/share/fonts/apple/apple-emoji.ttf https://github.com/samuelng
 fc-cache -f -v
 
 npm install
+npm install -g pm2
 
 npx puppeteer browsers install chrome
 
@@ -48,7 +83,10 @@ server {
 }
 EOF
 
-ln -s /etc/nginx/sites-available/$DOMAIN /etc/nginx/sites-enabled/
+if [ ! -L /etc/nginx/sites-enabled/$DOMAIN ]; then
+    ln -s /etc/nginx/sites-available/$DOMAIN /etc/nginx/sites-enabled/
+fi
+
 rm -f /etc/nginx/sites-enabled/default
 nginx -t && systemctl restart nginx
 
